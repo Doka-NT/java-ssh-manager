@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<AnchorPane
+        xmlns:fx="http://javafx.com/fxml/1"
+        xmlns="http://javafx.com/javafx/8.0.102-ea"
+        fx:id="root"
+        fx:controller="com.skobka.sshmanager.controller.MainController"
+        prefHeight="200.0"
+        prefWidth="200.0"
+>
+    <ListView
+            fx:id="lvConnections"
+            prefHeight="200.0" prefWidth="200.0"
+            AnchorPane.topAnchor="10"
+            AnchorPane.leftAnchor="10"
+            AnchorPane.rightAnchor="10"
+            AnchorPane.bottomAnchor="45"
+    />
+    <Button
+            fx:id="btnSettings"
+            mnemonicParsing="false"
+            text="Settings"
+            AnchorPane.bottomAnchor="10"
+            AnchorPane.leftAnchor="10"
+            AnchorPane.rightAnchor="50"/>
+    <Button
+            fx:id="btnReload"
+            mnemonicParsing="false"
+            AnchorPane.bottomAnchor="10"
+            AnchorPane.rightAnchor="10"
+            prefWidth="25"
+            maxWidth="25"
+            maxHeight="25"
+    >
+        <graphic>
+            <ImageView fitWidth="16" preserveRatio="true">
+                <Image url="/reload.png"/>
+            </ImageView>
+        </graphic>
+    </Button>
+</AnchorPane>

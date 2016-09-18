@@ -1,0 +1,30 @@
+{
+  "command": {
+    "ssh": [
+      "gnome-terminal",
+      "-x",
+      "ssh"
+    ],
+    "edit": ["xdg-open"]
+  },
+  "window": {
+    "x": 300,
+    "y": 300,
+    "width": 250,
+    "height": 400
+  },
+  "connections": [
+    {
+      "host": "root@localhost",
+      "label": "Localhost with port specified",
+      "port": 22
+    },
+    {
+      "host": "localhost",
+      "label": "Localhost with default port",
+      "args": [
+        "-l", "my_username"
+      ]
+    }
+  ]
+}

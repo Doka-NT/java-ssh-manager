@@ -1,0 +1,73 @@
+apply plugin: 'java'
+
+version = 1.0
+def appName = "SshManager"
+def appNameFull = appName + "-" + version
+def appNameFullJar = appNameFull + ".jar"
+def appNameFullZip = appNameFull + ".zip"
+def scriptsDir = "build/scripts"
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.apache.commons:commons-io:1.3.2'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.6.3'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.skobka.sshmanager.Main'
+        )
+    }
+    from {
+        //noinspection GroovyAssignabilityCheck
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+task copyResources(type:Copy) {
+    copy {
+        from "src/main/resources/icon.png"
+        into "$scriptsDir"
+    }
+}
+
+task createScripts {
+    mkdir(scriptsDir)
+    def shFile = new File("$scriptsDir/$appName"+".sh")
+    shFile.write("#!/usr/bin/env bash\n\njava -jar $appNameFullJar\n")
+    shFile.setExecutable(true)
+
+    def desktopFile = new File("$scriptsDir/$appName" + ".desktop")
+    desktopFile.write("")
+    desktopFile.append("[Desktop Entry]\n")
+    desktopFile.append("Name=$appName\n")
+    desktopFile.append("Comment=Store your connections to quickly access\n")
+    desktopFile.append("Keywords=shell;prompt;command;commandline;cmd;\n")
+    desktopFile.append("Exec=bash -c \"cd \$(dirname %k) && ./$appName" +".sh\"\n")
+    desktopFile.append("Icon=icon.png\n")
+    desktopFile.append("Type=Application\n")
+    desktopFile.append("StartupNotify=true\n")
+    desktopFile.append("X-GNOME-SingleWindow=false\n")
+    desktopFile.append("OnlyShowIn=GNOME;Unity;\n")
+    desktopFile.append("Actions=New\n")
+    desktopFile.setExecutable(true)
+
+    outputs.file(shFile)
+    outputs.file(desktopFile)
+    outputs.file(new File("$scriptsDir/icon.png"))
+}
+
+task createDist(type: Zip) {
+    archiveName = appNameFullZip
+    from jar
+    from createScripts
+    from copyResources
+}
+
+println createDist.archiveName
+println relativePath(createDist.destinationDir)
+println relativePath(createDist.archivePath)
