@@ -13,7 +13,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.AnchorPane;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -21,7 +20,7 @@ import java.util.Arrays;
  * @author Soshnikov Artem <213036@skobka.com>
  */
 
-public class MainController {
+public class JavaFxController extends AbstractController {
 
     public ListView<Connection> lvConnections;
     public AnchorPane root;
@@ -61,17 +60,13 @@ public class MainController {
         updateConnectionList();
     }
 
+    @Override
     public void initialize(Config config) throws NoConfigException {
         this.setConfig(config);
         this.updateConnectionList();
         this.updateBounds();
 
-        this.btnSettings.setOnAction(event -> {
-            String dir = System.getProperty("user.dir");
-            File file = new File(dir + this.config.getConfigFile());
-
-            openFile(file.getPath());
-        });
+        this.btnSettings.setOnAction(event -> openSettings(this.config.getConfigFile()));
 
         this.btnReload.setOnAction(event -> {
             try {
@@ -91,50 +86,16 @@ public class MainController {
             }
 
             Connection connection = lvConnections.getSelectionModel().getSelectedItem();
-
-            String host = connection.host != null ? connection.host : "localhost";
-            String port = connection.port > 1 ? String.valueOf(connection.port) : "22";
-            String args = connection.args != null ? String.join(" ", Arrays.asList(connection.args)) : "";
-
-            String cmd = String.join(" ", Arrays.asList(config.command.ssh));
-            String[] pipeline = {
-                    cmd, host, "-p", port, args
-            };
-
-            String fullCommand = String.join(" ", Arrays.asList(pipeline));
-            System.out.println(fullCommand);
             try {
-                Runtime.getRuntime().exec(fullCommand);
+                connection.connect(config);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
     }
 
-    /**
-     * Open file in default program
-     *
-     * @param filePath file
-     */
-    private void openFile(String filePath) {
-        String[] run = {
-                "xdg-open",
-                "rundll32 url.dll,FileProtocolHandler",
-                "open"
-        };
+    @Override
+    public void show() {
 
-        for (String cmd : run) {
-            try {
-                Runtime.getRuntime().exec(cmd + " " + filePath);
-                return;
-            } catch (IOException ignored) {
-            }
-        }
-
-        CustomAlert.show(
-                Alert.AlertType.WARNING,
-                "Cannot open file",
-                "Cannot open config file with default editor. \n" + filePath
-        );
     }
 }

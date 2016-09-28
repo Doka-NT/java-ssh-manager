@@ -1,6 +1,7 @@
 package com.skobka.sshmanager.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.skobka.sshmanager.app.AbstractApplication;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -18,7 +19,7 @@ public class Loader {
     private String configFileDist = "/config-dist.json";
 
     public Config load() throws IOException {
-        String dir = System.getProperty("user.home");
+        String dir = AbstractApplication.getHomeDir();
         File f = new File(dir + this.configFile);
         if (!f.exists()) {
             InputStream inputStream = getClass().getResourceAsStream(this.configFileDist);

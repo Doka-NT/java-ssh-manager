@@ -1,58 +1,37 @@
 package com.skobka.sshmanager;
 
-import com.skobka.sshmanager.config.Config;
-import com.skobka.sshmanager.config.Loader;
-import com.skobka.sshmanager.controller.MainController;
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
+import com.skobka.sshmanager.app.AppInterface;
+import com.skobka.sshmanager.app.AppJavaFx;
+import com.skobka.sshmanager.app.AppSwing;
+import org.apache.commons.cli.*;
 
-import java.io.IOException;
+public class Main {
 
-/**
- * @author Soshnikov Artem <213036@skobka.com>
- */
-public class Main extends Application {
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
-        Parent root = loader.load();
-        MainController controller = loader.getController();
-        primaryStage.setTitle("SshManager");
+    public static void main(String[] args) {
+        Options options = new Options();
 
-        Loader configLoader = new Loader();
-        Config config;
+        Option uiOption = new Option("i", "ui", true, "user interface (swing, javafx)");
+        uiOption.setRequired(false);
+        options.addOption(uiOption);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+
         try {
-            config = configLoader.load();
-        } catch (IOException e) {
-            CustomAlert.show(Alert.AlertType.ERROR, "Error",
-                    "Cannot create config file\n"
-                    +System.getProperty("user.home")+configLoader.getConfigFile());
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("java -jar SshManager.jar", options);
+
+            System.exit(1);
             return;
         }
 
-        primaryStage.setScene(new Scene(
-                root,
-                config.window.width,
-                config.window.height
-        ));
-        primaryStage.setMinWidth(config.window.width);
-        primaryStage.setMinHeight(config.window.height);
-        primaryStage.setWidth(config.window.width);
-        primaryStage.setHeight(config.window.height);
-        primaryStage.setResizable(false);
+        String ui = cmd.getOptionValue("ui", "swing");
 
-        primaryStage.getIcons().add(new Image(getClass().getResource("/icon.png").toURI().toString()));
+        AppInterface app = ui.equals("javafx") ? new AppJavaFx() : new AppSwing();
 
-        controller.initialize(config);
-        primaryStage.show();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
+        app.run();
     }
 }
